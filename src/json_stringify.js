@@ -71,6 +71,22 @@ var json_stringify = (function() {
     return result;
   };
 
+  var string = function(value) {
+    var match = value.match(/[\s\S]/gu) || [],
+        length = match.length,
+        result = '"';
+
+    for (var i = 0; i < length; i += 1) {
+      var char = match[i];
+      if (char.length === 1 && char >= '\ud800' && char <= '\udfff') {
+        result += '\\u' + char.codePointAt(0).toString(16);
+      } else {
+        result += char;
+      }
+    }        
+    return result + '"';
+  };
+
   var str = function(value, indent) {
     if (isNaN(value) || abs(value) === Infinity || value === null || typeof value === 'function') {
       return String(null);
@@ -81,8 +97,11 @@ var json_stringify = (function() {
     if (isRegExp(value)) {
       return '{}';
     }
-    if (typeof value === 'string' || isStringObject(value) || isDate(value)) {
-      return '"' + (isDate(value) ? value.toISOString() : value) + '"';
+    if (typeof value === 'string' || isStringObject(value)) {
+      return string(value);
+    }
+    if (isDate(value)) {
+      return '"' + value.toISOString() + '"';
     }
     if (isArray(value)) {
       return array(value, indent);
