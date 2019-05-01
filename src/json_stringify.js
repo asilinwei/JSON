@@ -81,11 +81,8 @@ var json_stringify = (function() {
     if (isRegExp(value)) {
       return '{}';
     }
-    if (typeof value === 'string' || isStringObject(value)) {
-      return '"' + value.replace
-    }
-    if (isDate(value)) {
-      return '"' + value.toISOString() + '"';
+    if (typeof value === 'string' || isStringObject(value) || isDate(value)) {
+      return '"' + (isDate(value) ? value.toISOString() : value) + '"';
     }
     if (isArray(value)) {
       return array(value, indent);
